@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.unityhospital</groupId>
-	<artifactId>patientservice</artifactId>
+	<artifactId>pricingservice</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>patientservice</name>
-	<description>Project for Spring Boot</description>
+	<name>pricingservice</name>
+	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -58,6 +58,10 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 
 		<dependency>
