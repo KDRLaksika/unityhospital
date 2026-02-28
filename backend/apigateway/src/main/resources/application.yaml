@@ -3,17 +3,57 @@ server:
 
 spring:
   application:
-    name: api-gateway
+    name: apigateway
 
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
+      routes:
+        - id: authservice
+          uri: lb://authservice
+          predicates:
+            - Path=/auth/**
+
+        - id: patientservice
+          uri: lb://patientservice
+          predicates:
+            - Path=/patients/**
+
+        - id: doctorservice
+          uri: lb://doctorservice
+          predicates:
+            - Path=/doctors/**
+
+        - id: appointmentservice
+          uri: lb://appointmentservice
+          predicates:
+            - Path=/appointments/**
+
+        - id: hospitalservice
+          uri: lb://hospitalservice
+          predicates:
+            - Path=/appointment-types/**
+
+        - id: pricingservice
+          uri: lb://pricingservice
+          predicates:
+            - Path=/price-plans/**
+
+        - id: pharmacyservice
+          uri: lb://pharmacyservice
+          predicates:
+            - Path=/drugs/**
+
+        - id: organizationservice
+          uri: lb://organizationservice
+          predicates:
+            - Path=/company-details/**
+
+        - id: billingservice
+          uri: lb://billingservice
+          predicates:
+            - Path=/invoices/**
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
-
