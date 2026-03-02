@@ -31,7 +31,8 @@ public class DoctorController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<DoctorResponseDto> update(@PathVariable UUID id, @Valid @RequestBody DoctorUpdateRequestDto dto) {
+    public ApiResponse<DoctorResponseDto> update(@PathVariable UUID id,
+            @Valid @RequestBody DoctorUpdateRequestDto dto) {
         return ApiResponse.ok(service.update(id, dto));
     }
 
@@ -48,8 +49,7 @@ public class DoctorController {
 
     @GetMapping("/dropdown")
     public ApiResponse<List<DoctorDropdownDto>> dropdown(
-            @RequestParam(required = false) String search
-    ) {
+            @RequestParam(required = false) String search) {
         return ApiResponse.ok(service.dropdown(search));
     }
 }
