@@ -7,6 +7,10 @@ import java.util.UUID;
 
 public interface IInvoiceService {
     InvoiceResponseDto getById(UUID id);
+
     InvoiceResponseDto create(InvoiceCreateRequestDto dto);
+
     InvoiceResponseDto update(UUID id, InvoiceUpdateRequestDto dto);
+
+    PageResponse<InvoiceResponseDto> list(InvoiceListRequestDto req);
 }

@@ -60,10 +60,14 @@ public class AppointmentTypeService implements IAppointmentTypeService {
         int page = Math.max(req.page, 1);
         int size = Math.min(Math.max(req.size, 1), 100);
 
+        if (req.isActive == null)
+            req.isActive = true;
+
         String sortBy = (req.sortBy == null || req.sortBy.isBlank()) ? "createdAt" : req.sortBy;
         String sortDir = (req.sortDir == null || req.sortDir.isBlank()) ? "desc" : req.sortDir;
 
-        if (!List.of("name", "createdAt").contains(sortBy)) sortBy = "createdAt";
+        if (!List.of("name", "createdAt").contains(sortBy))
+            sortBy = "createdAt";
 
         Sort sort = "asc".equalsIgnoreCase(sortDir)
                 ? Sort.by(sortBy).ascending()

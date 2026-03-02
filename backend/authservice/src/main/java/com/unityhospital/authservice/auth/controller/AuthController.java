@@ -6,6 +6,7 @@ import com.unityhospital.authservice.common.dto.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,14 +30,12 @@ public class AuthController {
 
     @GetMapping("/me")
     public ApiResponse<MeResponseDto> me(Authentication auth) {
-        // principal = userId (from JwtAuthFilter)
         String userId = (String) auth.getPrincipal();
         return ApiResponse.ok(service.me(userId));
     }
 
     @PostMapping("/forgot-password")
     public ApiResponse<String> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDto dto) {
-        // returns token for testing
         return ApiResponse.ok(service.forgotPassword(dto));
     }
 
@@ -44,5 +43,10 @@ public class AuthController {
     public ApiResponse<Object> resetPassword(@Valid @RequestBody ResetPasswordRequestDto dto) {
         service.resetPassword(dto);
         return ApiResponse.ok(null);
+    }
+
+    @GetMapping("/users")
+    public ApiResponse<List<UserListItemDto>> listUsers() {
+        return ApiResponse.ok(service.listUsers());
     }
 }

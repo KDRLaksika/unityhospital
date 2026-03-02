@@ -41,11 +41,14 @@ public class PatientService implements IPatientService {
     @Transactional
     public PatientResponseDto create(PatientCreateRequestDto dto) {
         if (dto.nic != null && !dto.nic.isBlank()) {
-            patientRepo.findByNic(dto.nic).ifPresent(p -> { throw new BadRequestException("NIC already exists."); });
+            patientRepo.findByNic(dto.nic).ifPresent(p -> {
+                throw new BadRequestException("NIC already exists.");
+            });
         }
 
         var p = new Patient();
-        applyToEntity(p, dto.firstName, dto.lastName, dto.nic, dto.phone, dto.email, dto.dateOfBirth, dto.gender, dto.address, dto.isActive);
+        applyToEntity(p, dto.firstName, dto.lastName, dto.nic, dto.phone, dto.email, dto.dateOfBirth, dto.gender,
+                dto.address, dto.isActive);
 
         if (dto.dependents != null) {
             for (var depDto : dto.dependents) {
@@ -72,7 +75,8 @@ public class PatientService implements IPatientService {
             }
         }
 
-        applyToEntity(p, dto.firstName, dto.lastName, dto.nic, dto.phone, dto.email, dto.dateOfBirth, dto.gender, dto.address, dto.isActive);
+        applyToEntity(p, dto.firstName, dto.lastName, dto.nic, dto.phone, dto.email, dto.dateOfBirth, dto.gender,
+                dto.address, dto.isActive);
 
         // Simple approach: replace dependents list (good for v1)
         if (dto.dependents != null) {
@@ -111,6 +115,10 @@ public class PatientService implements IPatientService {
         Specification<Patient> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 
+            if (req.isActive == null) {
+                req.isActive = true;
+            }
+
             if (req.isActive != null) {
                 predicates.add(cb.equal(root.get("isActive"), req.isActive));
             }
@@ -121,8 +129,7 @@ public class PatientService implements IPatientService {
                         cb.like(cb.lower(root.get("firstName")), s),
                         cb.like(cb.lower(root.get("lastName")), s),
                         cb.like(cb.lower(root.get("nic")), s),
-                        cb.like(cb.lower(root.get("phone")), s)
-                ));
+                        cb.like(cb.lower(root.get("phone")), s)));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));
@@ -130,7 +137,8 @@ public class PatientService implements IPatientService {
 
         Page<Patient> pageResult = patientRepo.findAll(spec, pageable);
 
-        // For dependents, don’t fetch in list (heavy). Return basic patient fields only (dependents null).
+        // For dependents, don’t fetch in list (heavy). Return basic patient fields only
+        // (dependents null).
         var items = pageResult.getContent().stream().map(p -> {
             var dto = new PatientResponseDto();
             dto.id = p.getId();
@@ -158,7 +166,7 @@ public class PatientService implements IPatientService {
         req.page = 0;
         req.size = 20;
         req.search = search;
-        req.isActive = isActive;
+        req.isActive = (isActive == null) ? true : isActive;
         req.sortBy = "firstName";
         req.sortDir = "asc";
 
@@ -173,15 +181,15 @@ public class PatientService implements IPatientService {
     }
 
     private void applyToEntity(Patient p,
-                               String firstName,
-                               String lastName,
-                               String nic,
-                               String phone,
-                               String email,
-                               java.time.LocalDate dob,
-                               String gender,
-                               String address,
-                               Boolean isActive) {
+            String firstName,
+            String lastName,
+            String nic,
+            String phone,
+            String email,
+            java.time.LocalDate dob,
+            String gender,
+            String address,
+            Boolean isActive) {
         p.setFirstName(firstName);
         p.setLastName(lastName);
         p.setNic(nic);
@@ -190,7 +198,8 @@ public class PatientService implements IPatientService {
         p.setDateOfBirth(dob);
         p.setGender(gender);
         p.setAddress(address);
-        if (isActive != null) p.setActive(isActive);
+        if (isActive != null)
+            p.setActive(isActive);
     }
 
     private void applyDependent(PatientDependent dep, PatientDependentRequestDto dto) {
@@ -200,6 +209,7 @@ public class PatientService implements IPatientService {
         dep.setPhone(dto.phone);
         dep.setDateOfBirth(dto.dateOfBirth);
         dep.setGender(dto.gender);
-        if (dto.isActive != null) dep.setActive(dto.isActive);
+        if (dto.isActive != null)
+            dep.setActive(dto.isActive);
     }
 }

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService implements IAuthService {
@@ -23,9 +25,9 @@ public class AuthService implements IAuthService {
     private final JwtUtil jwtUtil;
 
     public AuthService(IAppUserRepository userRepo,
-                       IPasswordResetTokenRepository tokenRepo,
-                       PasswordEncoder passwordEncoder,
-                       JwtUtil jwtUtil) {
+            IPasswordResetTokenRepository tokenRepo,
+            PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil) {
         this.userRepo = userRepo;
         this.tokenRepo = tokenRepo;
         this.passwordEncoder = passwordEncoder;
@@ -35,14 +37,15 @@ public class AuthService implements IAuthService {
     @Transactional
     @Override
     public AuthResponseDto register(RegisterRequestDto dto) {
-        if (userRepo.existsByEmailIgnoreCase(dto.email)) {
-            throw new BadRequestException("Email already exists.");
+        if (userRepo.existsByUsernameIgnoreCase(dto.username)) {
+            throw new BadRequestException("Username already exists.");
         }
 
         var user = new AppUser();
+        user.setUsername(dto.username.toLowerCase().trim());
         user.setEmail(dto.email.toLowerCase().trim());
         user.setPasswordHash(passwordEncoder.encode(dto.password));
-        user.setRole(dto.role != null ? dto.role : Role.STAFF);
+        user.setRole(dto.role != null ? dto.role : Role.UNKNOWN);
         user.setActive(true);
 
         var saved = userRepo.save(user);
@@ -58,13 +61,15 @@ public class AuthService implements IAuthService {
     @Transactional(readOnly = true)
     @Override
     public AuthResponseDto login(LoginRequestDto dto) {
-        var user = userRepo.findByEmailIgnoreCase(dto.email)
+        var user = userRepo.findByUsernameIgnoreCase(dto.username)
                 .orElseThrow(() -> new BadRequestException("Invalid credentials."));
 
-        if (!user.isActive()) throw new BadRequestException("User is inactive.");
+        if (!user.isActive())
+            throw new BadRequestException("User is inactive.");
 
         boolean ok = passwordEncoder.matches(dto.password, user.getPasswordHash());
-        if (!ok) throw new BadRequestException("Invalid credentials.");
+        if (!ok)
+            throw new BadRequestException("Invalid credentials.");
 
         var res = new AuthResponseDto();
         res.userId = user.getId();
@@ -94,7 +99,6 @@ public class AuthService implements IAuthService {
         var user = userRepo.findByEmailIgnoreCase(dto.email)
                 .orElseThrow(() -> new NotFoundException("User not found for email: " + dto.email));
 
-        // generate reset token (return it for testing; later email it)
         String token = UUID.randomUUID().toString().replace("-", "");
 
         var prt = new PasswordResetToken();
@@ -105,7 +109,7 @@ public class AuthService implements IAuthService {
 
         tokenRepo.save(prt);
 
-        return token; // For now return token in API response
+        return token;
     }
 
     @Transactional
@@ -114,8 +118,10 @@ public class AuthService implements IAuthService {
         var prt = tokenRepo.findByToken(dto.token)
                 .orElseThrow(() -> new BadRequestException("Invalid reset token."));
 
-        if (prt.isUsed()) throw new BadRequestException("Reset token already used.");
-        if (prt.getExpiresAt().isBefore(LocalDateTime.now())) throw new BadRequestException("Reset token expired.");
+        if (prt.isUsed())
+            throw new BadRequestException("Reset token already used.");
+        if (prt.getExpiresAt().isBefore(LocalDateTime.now()))
+            throw new BadRequestException("Reset token expired.");
 
         var user = prt.getUser();
         user.setPasswordHash(passwordEncoder.encode(dto.newPassword));
@@ -123,5 +129,21 @@ public class AuthService implements IAuthService {
 
         prt.setUsed(true);
         tokenRepo.save(prt);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<UserListItemDto> listUsers() {
+        return userRepo.findAll().stream()
+                .map(u -> {
+                    var dto = new UserListItemDto();
+                    dto.userId = u.getId();
+                    dto.username = u.getUsername();
+                    dto.email = u.getEmail();
+                    dto.role = u.getRole();
+                    dto.isActive = u.isActive();
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
