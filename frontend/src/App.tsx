@@ -9,6 +9,8 @@ import AdminAppointments from './pages/AdminAppointments';
 import AdminBilling from './pages/AdminBilling';
 import AdminPharmacy from './pages/AdminPharmacy';
 import AdminHospital from './pages/AdminHospital';
+import AdminStaff from './pages/AdminStaff';
+import AdminSettings from './pages/AdminSettings';
 
 function App() {
   return (
@@ -17,7 +19,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Protected Admin Routes */}
+        {/* Protected Admin Routes — any authenticated user */}
         <Route path="/admin" element={<ProtectedRoute />}>
           <Route element={<AdminLayout />}>
             <Route index element={<Navigate to="/admin/dashboard" replace />} />
@@ -25,13 +27,19 @@ function App() {
             <Route path="doctors" element={<AdminDoctors />} />
             <Route path="patients" element={<AdminPatients />} />
             <Route path="appointments" element={<AdminAppointments />} />
-            <Route path="billing" element={<AdminBilling />} />
-            <Route path="hospital" element={<AdminHospital />} />
-            <Route path="pharmacy" element={<AdminPharmacy />} />
+            <Route path="settings" element={<AdminSettings />} />
+
+            {/* Admin-only routes — STAFF gets redirected to dashboard */}
+            <Route element={<ProtectedRoute requiredRole="ADMIN" />}>
+              <Route path="billing" element={<AdminBilling />} />
+              <Route path="hospital" element={<AdminHospital />} />
+              <Route path="pharmacy" element={<AdminPharmacy />} />
+              <Route path="staff" element={<AdminStaff />} />
+            </Route>
           </Route>
         </Route>
 
-        {/* Redirect root to admin dashboard for now */}
+        {/* Redirect root to admin dashboard */}
         <Route path="/" element={<Navigate to="/admin" replace />} />
       </Routes>
     </BrowserRouter>

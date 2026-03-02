@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Ensure to handle the trailing slashes in your usages
 // Route all traffic through the API Gateway (Port 8080)
-export const GATEWAY_URL = 'http://localhost:8080';
+export const GATEWAY_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 export const AUTH_API_URL = `${GATEWAY_URL}/authservice/api`;
 export const DOCTOR_API_URL = `${GATEWAY_URL}/doctorservice/api`;
@@ -25,6 +25,7 @@ export const authApi = axios.create({
     baseURL: AUTH_API_URL,
     headers: { 'Content-Type': 'application/json' }
 });
+authApi.interceptors.request.use(authInterceptor);
 
 // Instance for Doctor Service
 export const doctorApi = axios.create({
