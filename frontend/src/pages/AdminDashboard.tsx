@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Users, Stethoscope, CalendarCheck, TrendingUp, Loader2 } from 'lucide-react';
 import { doctorService } from '../api/doctorService';
 import { patientService } from '../api/patientService';
@@ -34,6 +35,7 @@ const AdminDashboard = () => {
     const [recentAppointments, setRecentAppointments] = useState<any[]>([]);
     const [alerts, setAlerts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const fetchDashboardData = async () => {
         try {
@@ -132,7 +134,7 @@ const AdminDashboard = () => {
                             ))
                         )}
                     </div>
-                    <button className="w-full mt-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-md transition-colors">
+                    <button onClick={() => navigate('/admin/appointments')} className="w-full mt-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-md transition-colors">
                         View All Appointments
                     </button>
                 </div>
@@ -154,14 +156,6 @@ const AdminDashboard = () => {
                                 </div>
                             ))
                         )}
-                        {/* Static reminder for docs availability as it's not implemented yet */}
-                        <div className="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-900/30 flex gap-3 transition-colors">
-                            <div className="mt-0.5"><div className="w-2 h-2 rounded-full bg-yellow-500 dark:bg-yellow-400"></div></div>
-                            <div>
-                                <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-400">Unassigned Doctor Slots</p>
-                                <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">3 doctors have not submitted their availability for next week.</p>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

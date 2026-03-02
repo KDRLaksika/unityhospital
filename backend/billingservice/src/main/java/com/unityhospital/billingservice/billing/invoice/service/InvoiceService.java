@@ -45,8 +45,14 @@ public class InvoiceService implements IInvoiceService {
 
     @Override
     public PageResponse<InvoiceResponseDto> list(InvoiceListRequestDto req) {
+        if (req.isActive == null)
+            req.isActive = true;
+
         var pageable = org.springframework.data.domain.PageRequest.of(req.page, req.size);
-        var page = repo.findAll(pageable);
+
+        // Use a simple filtered query or repository method
+        var page = repo.findByIsActive(req.isActive, pageable);
+
         return PageResponse.of(
                 page.getContent().stream().map(InvoiceResponseDto::from).toList(),
                 page.getNumber(),

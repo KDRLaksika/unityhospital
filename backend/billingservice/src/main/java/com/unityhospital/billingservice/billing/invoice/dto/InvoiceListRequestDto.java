@@ -5,4 +5,5 @@ public class InvoiceListRequestDto {
     public int size = 10;
     public String patientName;
     public String status;
+    public Boolean isActive;
 }

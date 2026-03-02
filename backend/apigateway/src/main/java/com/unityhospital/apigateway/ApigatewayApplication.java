@@ -26,7 +26,6 @@ public class ApigatewayApplication {
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-		System.out.println(">>> API GATEWAY: DISABLING CSRF AND PERMITTING ALL <<<");
 		return http
 				.csrf(csrf -> csrf.disable())
 				.authorizeExchange(exchanges -> exchanges

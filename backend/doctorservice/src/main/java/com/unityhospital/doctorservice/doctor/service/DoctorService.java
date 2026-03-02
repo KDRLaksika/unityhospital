@@ -35,7 +35,8 @@ public class DoctorService implements IDoctorService {
         var d = new Doctor();
         DoctorMapper.applyCreate(d, dto);
         d.setActive(true);
-        if (dto.isAvailable == null) d.setAvailable(true);
+        if (dto.isAvailable == null)
+            d.setAvailable(true);
         return DoctorMapper.toDto(repo.save(d));
     }
 
@@ -61,11 +62,15 @@ public class DoctorService implements IDoctorService {
         int page = Math.max(req.page, 1);
         int size = Math.min(Math.max(req.size, 1), 100);
 
+        if (req.isActive == null)
+            req.isActive = true;
+
         String sortBy = (req.sortBy == null || req.sortBy.isBlank()) ? "createdAt" : req.sortBy;
         String sortDir = (req.sortDir == null || req.sortDir.isBlank()) ? "desc" : req.sortDir;
 
         // allow only these to avoid errors
-        if (!List.of("fullName", "speciality", "createdAt").contains(sortBy)) sortBy = "createdAt";
+        if (!List.of("fullName", "speciality", "createdAt").contains(sortBy))
+            sortBy = "createdAt";
 
         Sort sort = "asc".equalsIgnoreCase(sortDir)
                 ? Sort.by(sortBy).ascending()
