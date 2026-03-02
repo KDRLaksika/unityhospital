@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -15,6 +16,11 @@ export default {
           700: '#1d4ed8',
         },
         background: '#f4f7f6',
+        dark: {
+          bg: '#0f172a', // slate-900
+          card: '#1e293b', // slate-800
+          border: '#334155', // slate-700
+        }
       },
       fontFamily: {
         sans: ['Roboto', 'sans-serif'],

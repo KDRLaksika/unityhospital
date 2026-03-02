@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AdminLayout from './layouts/AdminLayout';
+import ProtectedRoute from './components/ProtectedRoute';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminDoctors from './pages/AdminDoctors';
@@ -13,20 +14,21 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Placeholder Login Route */}
-        <Route path="/login" element={<AdminLogin />} />
+        {/* Public Routes */}
+        <Route path="/admin/login" element={<AdminLogin />} />
 
-        {/* Admin Routes wrapped in Layout */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="doctors" element={<AdminDoctors />} />
-          <Route path="patients" element={<AdminPatients />} />
-          <Route path="appointments" element={<AdminAppointments />} />
-          <Route path="billing" element={<AdminBilling />} />
-          <Route path="hospital" element={<AdminHospital />} />
-          <Route path="pharmacy" element={<AdminPharmacy />} />
-          {/* We will add more nested routes here */}
+        {/* Protected Admin Routes */}
+        <Route path="/admin" element={<ProtectedRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route index element={<Navigate to="/admin/dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="doctors" element={<AdminDoctors />} />
+            <Route path="patients" element={<AdminPatients />} />
+            <Route path="appointments" element={<AdminAppointments />} />
+            <Route path="billing" element={<AdminBilling />} />
+            <Route path="hospital" element={<AdminHospital />} />
+            <Route path="pharmacy" element={<AdminPharmacy />} />
+          </Route>
         </Route>
 
         {/* Redirect root to admin dashboard for now */}
