@@ -26,6 +26,6 @@ eureka:
 
 app:
   jwt:
-    secret: ${JWT_SECRET}
+    secret: ${JWT_SECRET:my-32-character-ultra-secure-and-ultra-long-secret}
     issuer: unityhospital
     expiryMinutes: 60

@@ -1,6 +1,7 @@
 package com.unityhospital.billingservice.billing.invoice.controller;
 
 import com.unityhospital.billingservice.common.dto.ApiResponse;
+import com.unityhospital.billingservice.common.util.PageResponse;
 import com.unityhospital.billingservice.billing.invoice.dto.*;
 import com.unityhospital.billingservice.billing.invoice.service.IInvoiceService;
 import jakarta.validation.Valid;
@@ -34,5 +35,10 @@ public class InvoiceController {
             @PathVariable UUID id,
             @Valid @RequestBody InvoiceUpdateRequestDto dto) {
         return ApiResponse.ok(service.update(id, dto));
+    }
+
+    @PostMapping("/list")
+    public ApiResponse<PageResponse<InvoiceResponseDto>> list(@RequestBody InvoiceListRequestDto req) {
+        return ApiResponse.ok(service.list(req));
     }
 }
