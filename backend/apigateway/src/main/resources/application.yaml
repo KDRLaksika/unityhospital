@@ -11,6 +11,8 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
+      default-filters:
+        - StripPrefix=1
 
 eureka:
   client:

@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthService implements IAuthService {
@@ -97,7 +99,6 @@ public class AuthService implements IAuthService {
         var user = userRepo.findByEmailIgnoreCase(dto.email)
                 .orElseThrow(() -> new NotFoundException("User not found for email: " + dto.email));
 
-        // generate reset token (return it for testing; later email it)
         String token = UUID.randomUUID().toString().replace("-", "");
 
         var prt = new PasswordResetToken();
@@ -108,7 +109,7 @@ public class AuthService implements IAuthService {
 
         tokenRepo.save(prt);
 
-        return token; // For now return token in API response
+        return token;
     }
 
     @Transactional
@@ -128,5 +129,21 @@ public class AuthService implements IAuthService {
 
         prt.setUsed(true);
         tokenRepo.save(prt);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public List<UserListItemDto> listUsers() {
+        return userRepo.findAll().stream()
+                .map(u -> {
+                    var dto = new UserListItemDto();
+                    dto.userId = u.getId();
+                    dto.username = u.getUsername();
+                    dto.email = u.getEmail();
+                    dto.role = u.getRole();
+                    dto.isActive = u.isActive();
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
