@@ -11,6 +11,8 @@ export const APPOINTMENT_API_URL = `${GATEWAY_URL}/appointmentservice/api`;
 export const BILLING_API_URL = `${GATEWAY_URL}/billingservice/api`;
 export const PHARMACY_API_URL = `${GATEWAY_URL}/pharmacyservice/api`;
 export const HOSPITAL_API_URL = `${GATEWAY_URL}/hospitalservice/api`;
+export const PRICING_API_URL = `${GATEWAY_URL}/pricingservice/api`;
+export const ORGANIZATION_API_URL = `${GATEWAY_URL}/organizationservice/api`;
 
 const authInterceptor = (config: any) => {
     const token = localStorage.getItem('token');
@@ -68,3 +70,17 @@ export const hospitalApi = axios.create({
     headers: { 'Content-Type': 'application/json' }
 });
 hospitalApi.interceptors.request.use(authInterceptor);
+
+// Instance for Pricing Service
+export const pricingApi = axios.create({
+    baseURL: PRICING_API_URL,
+    headers: { 'Content-Type': 'application/json' }
+});
+pricingApi.interceptors.request.use(authInterceptor);
+
+// Instance for Organization Service
+export const organizationApi = axios.create({
+    baseURL: ORGANIZATION_API_URL,
+    headers: { 'Content-Type': 'application/json' }
+});
+organizationApi.interceptors.request.use(authInterceptor);

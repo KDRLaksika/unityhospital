@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Plus, Edit2, Trash2, UserRound, Loader2, RefreshCw, Save } from 'lucide-react';
 import { patientService } from '../api/patientService';
 import Modal from '../components/Modal';
+import DateInput from '../components/DateInput';
 
 const EMPTY_FORM = {
     firstName: '',
@@ -247,8 +248,11 @@ const AdminPatients = () => {
                             <input type="email" className={inputClass} placeholder="patient@email.com" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
                         </div>
                         <div>
-                            <label className={labelClass}>Date of Birth</label>
-                            <input type="date" className={inputClass} value={form.dateOfBirth} onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })} />
+                            <DateInput
+                                label="Date of Birth"
+                                value={form.dateOfBirth}
+                                onChange={(val) => setForm({ ...form, dateOfBirth: val })}
+                            />
                         </div>
                         <div>
                             <label className={labelClass}>Gender</label>

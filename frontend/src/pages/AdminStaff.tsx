@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserCog, Plus, Copy, Check, Mail, Loader2, RefreshCw, Search, Shield, User, Eye, EyeOff } from 'lucide-react';
+import { UserCog, Plus, Copy, Check, Mail, Loader2, RefreshCw, Search, Shield, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../api/authService';
 import Modal from '../components/Modal';
 
@@ -55,8 +55,14 @@ const AdminStaff = () => {
             } else {
                 setUsers([]);
             }
-        } catch {
-            setError('Could not load staff accounts. Make sure the auth service is running.');
+        } catch (err: any) {
+            console.error('[AdminStaff] Fetch users error:', err);
+            const status = err?.response?.status;
+            if (status === 401 || status === 403) {
+                setError('Access denied. You do not have permission to view staff accounts.');
+            } else {
+                setError('Could not load staff accounts. Make sure the auth service is running.');
+            }
         } finally {
             setLoading(false);
         }

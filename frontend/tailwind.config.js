@@ -11,9 +11,11 @@ export default {
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',
+          400: '#60a5fa',
           500: '#3b82f6',
           600: '#2563eb', // Corporate blue
           700: '#1d4ed8',
+          900: '#1e3a8a',
         },
         background: '#f4f7f6',
         dark: {
@@ -35,6 +37,13 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addUtilities }) {
+      addUtilities({
+        '.no-scrollbar::-webkit-scrollbar': { display: 'none' },
+        '.no-scrollbar': { '-ms-overflow-style': 'none', 'scrollbar-width': 'none' },
+      });
+    },
+  ],
 }
 

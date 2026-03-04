@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import unityHospitalLogo from '../assets/images/unity-hospital-logo.png';
+
 import {
     Users,
     Stethoscope,
@@ -40,12 +42,12 @@ const AdminLayout = () => {
         { name: 'Doctors', path: '/admin/doctors', icon: Stethoscope },
         { name: 'Patients', path: '/admin/patients', icon: Users },
         { name: 'Appointments', path: '/admin/appointments', icon: CalendarDays },
+        { name: 'Hospital', path: '/admin/hospital', icon: Building2 },
     ];
 
     // Links available ONLY to ADMIN
     const adminLinks = [
         { name: 'Billing', path: '/admin/billing', icon: Receipt },
-        { name: 'Hospital', path: '/admin/hospital', icon: Building2 },
         { name: 'Pharmacy', path: '/admin/pharmacy', icon: Pill },
         { name: 'Staff Management', path: '/admin/staff', icon: UserCog },
     ];
@@ -57,9 +59,18 @@ const AdminLayout = () => {
             {/* Sidebar */}
             <aside className="w-64 bg-white dark:bg-dark-card shadow-card flex flex-col z-10 transition-colors duration-200 border-r border-transparent dark:border-dark-border">
                 <div className="h-16 flex items-center justify-center border-b border-gray-100 dark:border-dark-border px-6">
-                    <div className="flex items-center gap-2 text-primary-600 dark:text-primary-500 font-bold text-xl tracking-tight">
-                        <Building2 className="h-6 w-6" />
-                        <span>UnityHospital</span>
+                    <div className="flex items-center gap-3">
+                        {/* Unity Hospital logo image */}
+                        <img
+                            src={unityHospitalLogo}
+                            alt="Unity Hospital Logo"
+                            className="w-9 h-9 object-contain flex-shrink-0"
+                        />
+
+                        <div className="flex flex-col leading-none">
+                            <span className="font-bold text-gray-900 dark:text-gray-100 text-base tracking-tight">Unity Hospital</span>
+                            <span className="text-[10px] text-primary-500 font-semibold tracking-widest uppercase">Admin Portal</span>
+                        </div>
                     </div>
                 </div>
 

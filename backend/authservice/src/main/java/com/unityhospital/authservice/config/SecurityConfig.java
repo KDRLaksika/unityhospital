@@ -27,7 +27,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/register",
                                 "/api/auth/forgot-password",
-                                "/api/auth/reset-password")
+                                "/api/auth/reset-password",
+                                "/api/auth/users")
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
