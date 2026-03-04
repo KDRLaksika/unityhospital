@@ -11,6 +11,7 @@ import AdminPharmacy from './pages/AdminPharmacy';
 import AdminHospital from './pages/AdminHospital';
 import AdminStaff from './pages/AdminStaff';
 import AdminSettings from './pages/AdminSettings';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -41,6 +42,9 @@ function App() {
 
         {/* Redirect root to admin dashboard */}
         <Route path="/" element={<Navigate to="/admin" replace />} />
+
+        {/* Catch-all 404 Route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

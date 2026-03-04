@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { UserCog, Plus, Copy, Check, Mail, Loader2, RefreshCw, Search, Shield, User, Eye, EyeOff } from 'lucide-react';
+import { UserCog, Plus, Copy, Check, Mail, Loader2, RefreshCw, Search, Shield, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../api/authService';
 import Modal from '../components/Modal';
 
