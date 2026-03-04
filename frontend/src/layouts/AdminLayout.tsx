@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import unityHospitalLogo from '../assets/images/unity-hospital-logo.png';
+
 import {
     Users,
     Stethoscope,
@@ -58,13 +60,13 @@ const AdminLayout = () => {
             <aside className="w-64 bg-white dark:bg-dark-card shadow-card flex flex-col z-10 transition-colors duration-200 border-r border-transparent dark:border-dark-border">
                 <div className="h-16 flex items-center justify-center border-b border-gray-100 dark:border-dark-border px-6">
                     <div className="flex items-center gap-3">
-                        {/* Custom hospital cross logo */}
-                        <div className="w-8 h-8 rounded-lg bg-primary-600 flex items-center justify-center shadow-sm flex-shrink-0">
-                            <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-                                <rect x="10" y="3" width="4" height="18" rx="1.5" fill="white" />
-                                <rect x="3" y="10" width="18" height="4" rx="1.5" fill="white" />
-                            </svg>
-                        </div>
+                        {/* Unity Hospital logo image */}
+                        <img
+                            src={unityHospitalLogo}
+                            alt="Unity Hospital Logo"
+                            className="w-9 h-9 object-contain flex-shrink-0"
+                        />
+
                         <div className="flex flex-col leading-none">
                             <span className="font-bold text-gray-900 dark:text-gray-100 text-base tracking-tight">Unity Hospital</span>
                             <span className="text-[10px] text-primary-500 font-semibold tracking-widest uppercase">Admin Portal</span>

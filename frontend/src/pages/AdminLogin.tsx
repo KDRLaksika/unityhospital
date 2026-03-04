@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Building2, Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Lock, User, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import unityHospitalLogo from '../assets/images/unity-hospital-logo.png';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -30,10 +31,12 @@ const AdminLogin = () => {
 
                 {/* Logo Section */}
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center mb-4 shadow-card">
-                        <Building2 className="w-8 h-8 text-white" />
-                    </div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">UnityHospital</h1>
+                    <img
+                        src={unityHospitalLogo}
+                        alt="Unity Hospital Logo"
+                        className="w-24 h-24 object-contain mb-3 drop-shadow-md"
+                    />
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Unity Hospital</h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-2 font-medium">Administration Portal Gateway</p>
                 </div>
 
