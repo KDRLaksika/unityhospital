@@ -55,8 +55,14 @@ const AdminStaff = () => {
             } else {
                 setUsers([]);
             }
-        } catch {
-            setError('Could not load staff accounts. Make sure the auth service is running.');
+        } catch (err: any) {
+            console.error('[AdminStaff] Fetch users error:', err);
+            const status = err?.response?.status;
+            if (status === 401 || status === 403) {
+                setError('Access denied. You do not have permission to view staff accounts.');
+            } else {
+                setError('Could not load staff accounts. Make sure the auth service is running.');
+            }
         } finally {
             setLoading(false);
         }

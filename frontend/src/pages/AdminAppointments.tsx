@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, Clock, Plus, Edit2, Trash2, User, Loader2, RefreshCw, Search, Save } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Plus, Edit2, Trash2, User, Loader2, RefreshCw, Search, Save, Copy, Check } from 'lucide-react';
 import { appointmentService } from '../api/appointmentService';
 import { doctorService } from '../api/doctorService';
 import { patientService } from '../api/patientService';
 import Modal from '../components/Modal';
+import TimeInput from '../components/TimeInput';
+import DateInput from '../components/DateInput';
 
 const EMPTY_FORM = {
     patientId: '',
@@ -39,6 +41,14 @@ const AdminAppointments = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [deleteError, setDeleteError] = useState('');
     const [deleting, setDeleting] = useState(false);
+
+    // Copy feedback
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const handleCopyId = (id: string) => {
+        navigator.clipboard.writeText(id);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
 
     const fetchNames = async () => {
         try {
@@ -274,7 +284,21 @@ const AdminAppointments = () => {
                                         <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusColor(apt.status)}`}>{apt.status?.replace('_', ' ')}</span>
                                     </td>
                                     <td className="px-6 py-4 text-right">
-                                        <div className="flex justify-end gap-2">
+                                        <div className="flex justify-end gap-1.5">
+                                            <button
+                                                onClick={() => handleCopyId(apt.id)}
+                                                className="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1 relative group"
+                                                title="Copy Appointment ID"
+                                            >
+                                                {copiedId === apt.id
+                                                    ? <Check className="w-4 h-4 text-green-500" />
+                                                    : <Copy className="w-4 h-4" />}
+                                                {copiedId === apt.id && (
+                                                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-0.5 rounded whitespace-nowrap font-medium">
+                                                        Copied!
+                                                    </span>
+                                                )}
+                                            </button>
                                             <button onClick={() => openEditModal(apt)} className="text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors p-1" title="Edit"><Edit2 className="w-4 h-4" /></button>
                                             <button onClick={() => confirmDelete(apt.id)} className="text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors p-1" title="Delete"><Trash2 className="w-4 h-4" /></button>
                                         </div>
@@ -305,12 +329,20 @@ const AdminAppointments = () => {
                             </select>
                         </div>
                         <div>
-                            <label className={labelClass}>Date <span className="text-red-500">*</span></label>
-                            <input type="date" className={inputClass} value={form.appointmentDate} onChange={(e) => setForm({ ...form, appointmentDate: e.target.value })} />
+                            <DateInput
+                                label="Date"
+                                required
+                                value={form.appointmentDate}
+                                onChange={(val) => setForm({ ...form, appointmentDate: val })}
+                            />
                         </div>
                         <div>
-                            <label className={labelClass}>Time <span className="text-red-500">*</span></label>
-                            <input type="time" className={inputClass} value={form.appointmentTime} onChange={(e) => setForm({ ...form, appointmentTime: e.target.value })} />
+                            <TimeInput
+                                label="Time"
+                                required
+                                value={form.appointmentTime}
+                                onChange={(val) => setForm({ ...form, appointmentTime: val })}
+                            />
                         </div>
                         {editingAppointment && (
                             <div>

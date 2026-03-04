@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Receipt, Plus, Edit2, Search, Download, CheckCircle2, AlertCircle, Loader2, RefreshCw, Save } from 'lucide-react';
 import { billingService } from '../api/billingService';
 import { patientService } from '../api/patientService';
+import { pricingService } from '../api/pricingService';
+import { appointmentService } from '../api/appointmentService';
 import Modal from '../components/Modal';
 
 const EMPTY_CREATE_FORM = { patientId: '', appointmentId: '', pricePlanId: '', totalAmount: '' };
@@ -13,6 +15,8 @@ const AdminBilling = () => {
     const [error, setError] = useState('');
     const [patientsMap, setPatientsMap] = useState<Record<string, any>>({});
     const [patientsList, setPatientsList] = useState<any[]>([]);
+    const [pricePlansList, setPricePlansList] = useState<any[]>([]);
+    const [appointmentsList, setAppointmentsList] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredInvoices, setFilteredInvoices] = useState<any[]>([]);
 
@@ -34,6 +38,20 @@ const AdminBilling = () => {
                 setPatientsMap(pMap);
                 setPatientsList(res.data.items);
             }
+        } catch { /* silent */ }
+    };
+
+    const fetchPricePlans = async () => {
+        try {
+            const res = await pricingService.getAllPricePlans({ size: 1000, page: 0 });
+            if (res.success) setPricePlansList(res.data?.items || res.data || []);
+        } catch { /* silent */ }
+    };
+
+    const fetchAppointments = async () => {
+        try {
+            const res = await appointmentService.getAllAppointments({ size: 1000, page: 0 });
+            if (res.success) setAppointmentsList(res.data?.items || res.data || []);
         } catch { /* silent */ }
     };
 
@@ -66,7 +84,12 @@ const AdminBilling = () => {
     }, [searchTerm, invoices, patientsMap]);
 
     useEffect(() => {
-        const loadAll = async () => { await fetchPatients(); await fetchInvoices(); };
+        const loadAll = async () => {
+            await fetchPatients();
+            await fetchPricePlans();
+            await fetchAppointments();
+            await fetchInvoices();
+        };
         loadAll();
     }, []);
 
@@ -81,6 +104,16 @@ const AdminBilling = () => {
         setUpdateForm({ status: inv.status || 'PENDING' });
         setFormError('');
         setShowUpdateModal(true);
+    };
+
+    // When price plan is selected, auto-fill the total amount
+    const handlePricePlanChange = (planId: string) => {
+        const plan = pricePlansList.find(p => p.id === planId);
+        setCreateForm(f => ({
+            ...f,
+            pricePlanId: planId,
+            totalAmount: plan ? plan.amount?.toString() : f.totalAmount,
+        }));
     };
 
     const handleCreate = async () => {
@@ -137,6 +170,13 @@ const AdminBilling = () => {
         return 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400';
     };
 
+    // Find appointment label for display
+    const getAppointmentLabel = (apt: any) => {
+        const patient = patientsMap[apt.patientId];
+        const patientName = patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown';
+        return `${patientName} · ${apt.appointmentDate} ${apt.appointmentTime || ''}`.trim();
+    };
+
     const inputClass = "block w-full px-3 py-2 border border-gray-300 dark:border-dark-border rounded-md text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-bg text-gray-900 dark:text-gray-200 transition-colors";
     const labelClass = "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1";
 
@@ -158,7 +198,7 @@ const AdminBilling = () => {
                 </div>
             </div>
 
-            {/* Summary Cards (real data) */}
+            {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="bg-white dark:bg-dark-card p-6 rounded-xl shadow-card border border-gray-100 dark:border-dark-border transition-colors">
                     <p className="text-sm font-medium text-gray-500 mb-1">Total Revenue (Paid)</p>
@@ -245,6 +285,7 @@ const AdminBilling = () => {
             {/* Create Invoice Modal */}
             <Modal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} title="Generate Invoice" size="lg">
                 <div className="space-y-4">
+                    {/* Patient */}
                     <div>
                         <label className={labelClass}>Patient <span className="text-red-500">*</span></label>
                         <select className={inputClass} value={createForm.patientId} onChange={(e) => setCreateForm({ ...createForm, patientId: e.target.value })}>
@@ -252,17 +293,62 @@ const AdminBilling = () => {
                             {patientsList.map(p => <option key={p.id} value={p.id}>{p.firstName} {p.lastName}</option>)}
                         </select>
                     </div>
+
+                    {/* Appointment Dropdown */}
                     <div>
-                        <label className={labelClass}>Appointment ID <span className="text-red-500">*</span></label>
-                        <input type="text" className={inputClass} placeholder="UUID of appointment" value={createForm.appointmentId} onChange={(e) => setCreateForm({ ...createForm, appointmentId: e.target.value })} />
+                        <label className={labelClass}>Appointment <span className="text-red-500">*</span></label>
+                        <select
+                            className={inputClass}
+                            value={createForm.appointmentId}
+                            onChange={(e) => setCreateForm({ ...createForm, appointmentId: e.target.value })}
+                        >
+                            <option value="">Select Appointment</option>
+                            {appointmentsList
+                                .filter(a => !createForm.patientId || a.patientId === createForm.patientId)
+                                .map(a => (
+                                    <option key={a.id} value={a.id}>
+                                        {getAppointmentLabel(a)} · {a.id.substring(0, 8)}...
+                                    </option>
+                                ))}
+                        </select>
+                        <p className="text-xs text-gray-400 mt-1">Select a patient first to filter appointments.</p>
                     </div>
+
+                    {/* Price Plan Dropdown */}
                     <div>
-                        <label className={labelClass}>Price Plan ID <span className="text-red-500">*</span></label>
-                        <input type="text" className={inputClass} placeholder="UUID of price plan" value={createForm.pricePlanId} onChange={(e) => setCreateForm({ ...createForm, pricePlanId: e.target.value })} />
+                        <label className={labelClass}>Price Plan <span className="text-red-500">*</span></label>
+                        <select
+                            className={inputClass}
+                            value={createForm.pricePlanId}
+                            onChange={(e) => handlePricePlanChange(e.target.value)}
+                        >
+                            <option value="">Select Price Plan</option>
+                            {pricePlansList.map(plan => (
+                                <option key={plan.id} value={plan.id}>
+                                    {plan.name} — LKR {plan.amount?.toLocaleString()}
+                                </option>
+                            ))}
+                        </select>
+                        {pricePlansList.length === 0 && (
+                            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                                ⚠ No price plans found. Add them in Hospital Settings → Service Pricing.
+                            </p>
+                        )}
                     </div>
+
+                    {/* Total Amount — auto-filled from plan, but editable */}
                     <div>
                         <label className={labelClass}>Total Amount (LKR) <span className="text-red-500">*</span></label>
-                        <input type="number" className={inputClass} placeholder="e.g. 2500.00" value={createForm.totalAmount} onChange={(e) => setCreateForm({ ...createForm, totalAmount: e.target.value })} />
+                        <input
+                            type="number"
+                            className={inputClass}
+                            placeholder="Auto-filled from price plan, or enter manually"
+                            value={createForm.totalAmount}
+                            onChange={(e) => setCreateForm({ ...createForm, totalAmount: e.target.value })}
+                        />
+                        {createForm.pricePlanId && (
+                            <p className="text-xs text-green-600 dark:text-green-400 mt-1">✓ Amount auto-filled from selected price plan.</p>
+                        )}
                     </div>
 
                     {formError && <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-md">{formError}</p>}

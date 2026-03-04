@@ -58,7 +58,7 @@ const AdminDashboard = () => {
 
             // Map recent appointments (last 4)
             const appointmentsList = appts.data?.items || [];
-            setRecentAppointments(appointmentsList.slice(0, 4));
+            setRecentAppointments(appointmentsList.slice(0, 10));
 
             // Map alerts (Low stock)
             const lowStockItems = drugs.data?.items?.filter((d: any) => (d.currentStock || 0) < 100) || [];
@@ -106,58 +106,100 @@ const AdminDashboard = () => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
-                {/* Recent Activity Mock */}
-                <div className="bg-white dark:bg-dark-card rounded-xl shadow-card border border-gray-100 dark:border-dark-border p-6 transition-colors">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Recent Appointments</h2>
-                    <div className="space-y-4">
+
+                {/* ── Recent Appointments ── */}
+                <div className="bg-white dark:bg-dark-card rounded-xl shadow-card border border-gray-100 dark:border-dark-border overflow-hidden transition-colors flex flex-col">
+                    {/* Fixed header */}
+                    <div className="flex items-center justify-between px-6 pt-5 pb-3">
+                        <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">Recent Appointments</h2>
+                        <span className="text-xs text-gray-400 font-medium">{recentAppointments.length} shown</span>
+                    </div>
+
+                    {/* Scrollable body — max 10 rows before scroll kicks in (~384px) */}
+                    <div className="overflow-y-auto flex-1" style={{ maxHeight: '22rem', scrollbarWidth: 'thin' }}>
                         {recentAppointments.length === 0 ? (
-                            <p className="text-sm text-gray-500 py-4 text-center">No recent appointments found.</p>
+                            <p className="text-sm text-gray-500 py-10 text-center">No recent appointments found.</p>
                         ) : (
-                            recentAppointments.map((apt) => (
-                                <div key={apt.id} className="flex items-center justify-between p-3 hover:bg-gray-50 dark:hover:bg-dark-border/50 rounded-lg transition-colors border border-transparent hover:border-gray-100 dark:hover:border-dark-border">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-400 font-bold text-sm">
-                                            {apt.patientName?.charAt(0) || 'P'}
+                            <div className="divide-y divide-gray-100 dark:divide-dark-border">
+                                {recentAppointments.map((apt) => (
+                                    <div key={apt.id} className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 dark:hover:bg-dark-border/50 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-700 dark:text-blue-400 font-bold text-sm flex-shrink-0">
+                                                {apt.patientName?.charAt(0) || 'P'}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate">{apt.patientName || 'Anonymous'}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{apt.departmentName || 'General Dept.'}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900 dark:text-gray-200">{apt.patientName || 'Anonymous'}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">{apt.departmentName || 'General Dept.'}</p>
+                                        <div className="text-right flex-shrink-0 ml-3">
+                                            <p className="text-xs font-semibold text-gray-900 dark:text-gray-200">{apt.appointmentTime || 'N/A'}</p>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${apt.status === 'COMPLETED'
+                                                    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                                    : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                }`}>
+                                                {apt.status || 'Pending'}
+                                            </span>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-200">{apt.appointmentTime || 'N/A'}</p>
-                                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${apt.status === 'COMPLETED' ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}`}>
-                                            {apt.status || 'Pending'}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))
+                                ))}
+                            </div>
                         )}
                     </div>
-                    <button onClick={() => navigate('/admin/appointments')} className="w-full mt-4 py-2 text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-md transition-colors">
-                        View All Appointments
-                    </button>
+
+                    {/* Pinned footer button */}
+                    <div className="border-t border-gray-100 dark:border-dark-border px-6 py-3">
+                        <button
+                            onClick={() => navigate('/admin/appointments')}
+                            className="w-full py-2 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-md transition-colors"
+                        >
+                            View All Appointments →
+                        </button>
+                    </div>
                 </div>
 
-                {/* System Alerts Mock */}
-                <div className="bg-white dark:bg-dark-card rounded-xl shadow-card border border-gray-100 dark:border-dark-border p-6 transition-colors">
-                    <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">System Alerts</h2>
-                    <div className="space-y-4">
-                        {alerts.length === 0 ? (
-                            <p className="text-sm text-gray-500 py-4 text-center">No critical system alerts found.</p>
-                        ) : (
-                            alerts.map((alert) => (
-                                <div key={alert.id} className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 flex gap-3 transition-colors">
-                                    <div className="mt-0.5"><div className="w-2 h-2 rounded-full bg-red-500 dark:bg-red-400"></div></div>
-                                    <div>
-                                        <p className="text-sm font-semibold text-red-800 dark:text-red-400">{alert.title}</p>
-                                        <p className="text-xs text-red-600 dark:text-red-300 mt-1">{alert.message}</p>
-                                    </div>
-                                </div>
-                            ))
+                {/* ── System Alerts ── */}
+                <div className="bg-white dark:bg-dark-card rounded-xl shadow-card border border-gray-100 dark:border-dark-border overflow-hidden transition-colors flex flex-col">
+                    {/* Fixed header */}
+                    <div className="flex items-center justify-between px-6 pt-5 pb-3">
+                        <h2 className="text-base font-bold text-gray-900 dark:text-gray-100">System Alerts</h2>
+                        {alerts.length > 0 && (
+                            <span className="text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-2 py-0.5 rounded-full">
+                                {alerts.length} alert{alerts.length !== 1 ? 's' : ''}
+                            </span>
                         )}
                     </div>
+
+                    {/* Scrollable body */}
+                    <div className="overflow-y-auto flex-1" style={{ maxHeight: '22rem', scrollbarWidth: 'thin' }}>
+                        {alerts.length === 0 ? (
+                            <p className="text-sm text-gray-500 py-10 text-center">✓ No critical system alerts.</p>
+                        ) : (
+                            <div className="px-6 py-3 space-y-3">
+                                {alerts.slice(0, 10).map((alert) => (
+                                    <div key={alert.id} className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 flex gap-3">
+                                        <div className="mt-1.5 flex-shrink-0"><div className="w-2 h-2 rounded-full bg-red-500 dark:bg-red-400"></div></div>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-semibold text-red-800 dark:text-red-400">{alert.title}</p>
+                                            <p className="text-xs text-red-600 dark:text-red-300 mt-0.5 leading-relaxed">{alert.message}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Pinned footer button */}
+                    <div className="border-t border-gray-100 dark:border-dark-border px-6 py-3">
+                        <button
+                            onClick={() => navigate('/admin/pharmacy')}
+                            className="w-full py-2 text-sm font-semibold text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 rounded-md transition-colors"
+                        >
+                            View Pharmacy Stock →
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
     );
