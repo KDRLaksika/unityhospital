@@ -63,7 +63,11 @@ public class CompanyDetailService implements ICompanyDetailService {
         String sortBy = (req.sortBy == null || req.sortBy.isBlank()) ? "createdAt" : req.sortBy;
         String sortDir = (req.sortDir == null || req.sortDir.isBlank()) ? "desc" : req.sortDir;
 
-        if (!List.of("name", "createdAt").contains(sortBy)) sortBy = "createdAt";
+        if (req.isActive == null)
+            req.isActive = true;
+
+        if (!List.of("name", "createdAt").contains(sortBy))
+            sortBy = "createdAt";
 
         Sort sort = "asc".equalsIgnoreCase(sortDir)
                 ? Sort.by(sortBy).ascending()

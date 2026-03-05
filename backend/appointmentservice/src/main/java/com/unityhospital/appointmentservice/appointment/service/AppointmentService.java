@@ -75,7 +75,8 @@ public class AppointmentService implements IAppointmentService {
         String sortDir = (req.sortDir == null || req.sortDir.isBlank()) ? "desc" : req.sortDir;
 
         // allow only safe sortable fields
-        if (!List.of("appointmentDate", "createdAt").contains(sortBy)) sortBy = "createdAt";
+        if (!List.of("appointmentDate", "createdAt").contains(sortBy))
+            sortBy = "createdAt";
 
         Sort sort = "asc".equalsIgnoreCase(sortDir)
                 ? Sort.by(sortBy).ascending()
@@ -85,6 +86,10 @@ public class AppointmentService implements IAppointmentService {
 
         Specification<Appointment> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            if (req.isActive == null) {
+                req.isActive = true;
+            }
 
             if (req.isActive != null) {
                 predicates.add(cb.equal(root.get("isActive"), req.isActive));

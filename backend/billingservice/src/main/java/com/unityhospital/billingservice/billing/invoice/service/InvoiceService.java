@@ -1,5 +1,6 @@
 package com.unityhospital.billingservice.billing.invoice.service;
 
+import com.unityhospital.billingservice.common.util.PageResponse;
 import com.unityhospital.billingservice.billing.invoice.dto.*;
 import com.unityhospital.billingservice.billing.invoice.entity.Invoice;
 import com.unityhospital.billingservice.billing.invoice.repository.IInvoiceRepository;
@@ -40,5 +41,23 @@ public class InvoiceService implements IInvoiceService {
                 .orElseThrow(() -> new NotFoundException("Invoice not found"));
         e.setStatus(dto.status);
         return InvoiceResponseDto.from(repo.save(e));
+    }
+
+    @Override
+    public PageResponse<InvoiceResponseDto> list(InvoiceListRequestDto req) {
+        if (req.isActive == null)
+            req.isActive = true;
+
+        var pageable = org.springframework.data.domain.PageRequest.of(req.page, req.size);
+
+        // Use a simple filtered query or repository method
+        var page = repo.findByIsActive(req.isActive, pageable);
+
+        return PageResponse.of(
+                page.getContent().stream().map(InvoiceResponseDto::from).toList(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements(),
+                page.getTotalPages());
     }
 }
