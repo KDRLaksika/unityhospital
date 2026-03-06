@@ -13,17 +13,6 @@ spring:
           lower-case-service-id: true
       default-filters:
         - StripPrefix=1
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOriginPatterns: "*"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-              - OPTIONS
-            allowedHeaders: "*"
 
 eureka:
   client:

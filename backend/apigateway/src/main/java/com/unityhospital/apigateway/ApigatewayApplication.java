@@ -36,8 +36,7 @@ public class ApigatewayApplication {
 	@Bean
 	public CorsWebFilter corsWebFilter() {
 		CorsConfiguration corsConfig = new CorsConfiguration();
-		corsConfig.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173",
-				"http://localhost:3000", "http://127.0.0.1:3000"));
+		corsConfig.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173"));
 		corsConfig.setMaxAge(3600L);
 		corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 		corsConfig.setAllowedHeaders(Arrays.asList("*"));
