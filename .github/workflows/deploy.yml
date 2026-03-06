@@ -1,0 +1,123 @@
+name: CI/CD Pipeline to AWS ECR
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: unityhospital
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    - name: Build, tag, and push apigateway
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/apigateway
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:apigateway-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:apigateway-$IMAGE_TAG
+    - name: Build, tag, and push appointmentservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/appointmentservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:appointmentservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:appointmentservice-$IMAGE_TAG
+    - name: Build, tag, and push authservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/authservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:authservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:authservice-$IMAGE_TAG
+    - name: Build, tag, and push billingservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/billingservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:billingservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:billingservice-$IMAGE_TAG
+    - name: Build, tag, and push doctorservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/doctorservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:doctorservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:doctorservice-$IMAGE_TAG
+    - name: Build, tag, and push eurekaserver
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/eurekaserver
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:eurekaserver-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:eurekaserver-$IMAGE_TAG
+    - name: Build, tag, and push hospitalservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/hospitalservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:hospitalservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:hospitalservice-$IMAGE_TAG
+    - name: Build, tag, and push organizationservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/organizationservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:organizationservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:organizationservice-$IMAGE_TAG
+    - name: Build, tag, and push patientservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/patientservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:patientservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:patientservice-$IMAGE_TAG
+    - name: Build, tag, and push pharmacyservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/pharmacyservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:pharmacyservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:pharmacyservice-$IMAGE_TAG
+    - name: Build, tag, and push pricingservice
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend/pricingservice
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:pricingservice-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:pricingservice-$IMAGE_TAG
+    - name: Build, tag, and push frontend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd frontend
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:frontend-$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:frontend-$IMAGE_TAG
