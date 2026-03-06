@@ -1,0 +1,9 @@
+CREATE DATABASE appointmentdb;
+CREATE DATABASE authdb;
+CREATE DATABASE billingdb;
+CREATE DATABASE doctordb;
+CREATE DATABASE hospitaldb;
+CREATE DATABASE organizationdb;
+CREATE DATABASE patientdb;
+CREATE DATABASE pharmacydb;
+CREATE DATABASE pricingdb;
