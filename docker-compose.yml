@@ -1,0 +1,180 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres-db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:6-jammy
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+
+  eurekaserver:
+    build: ./backend/eurekaserver
+    container_name: eurekaserver
+    ports:
+      - "8761:8761"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  apigateway:
+    build: ./backend/apigateway
+    container_name: apigateway
+    ports:
+      - "8080:8080"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+    depends_on:
+      - eurekaserver
+
+  appointmentservice:
+    build: ./backend/appointmentservice
+    container_name: appointmentservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/appointmentdb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  authservice:
+    build: ./backend/authservice
+    container_name: authservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/authdb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  billingservice:
+    build: ./backend/billingservice
+    container_name: billingservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/billingdb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  doctorservice:
+    build: ./backend/doctorservice
+    container_name: doctorservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/doctordb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  hospitalservice:
+    build: ./backend/hospitalservice
+    container_name: hospitalservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/hospitaldb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  organizationservice:
+    build: ./backend/organizationservice
+    container_name: organizationservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/organizationdb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  patientservice:
+    build: ./backend/patientservice
+    container_name: patientservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/patientdb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  pharmacyservice:
+    build: ./backend/pharmacyservice
+    container_name: pharmacyservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/pharmacydb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  pricingservice:
+    build: ./backend/pricingservice
+    container_name: pricingservice
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eurekaserver:8761/eureka/
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/pricingdb
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eurekaserver:
+        condition: service_started
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - apigateway
+
+volumes:
+  pgdata:
+  mongodata:
+
