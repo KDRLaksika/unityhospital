@@ -4,6 +4,8 @@ services:
   postgres:
     image: postgres:18-alpine
     container_name: postgres-db
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -12,7 +14,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
-      - ./init-users.sql:/docker-entrypoint-initdb.d/init-users.sql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 10s
@@ -176,3 +177,4 @@ services:
 volumes:
   pgdata:
   mongodata:
+
